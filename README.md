@@ -29,9 +29,8 @@ delete them.
 
 
 ## 🐛 Issues
-Se as imagens não carregarem no mobile, será necessário mudar 
-[o link da linha 7](https://github.com/guivictorr/happy/blob/master/backend/src/views/images_view.ts)
-de http://localhost:1337 para o link que está acima do QR CODE na página do Expo
+
+Feel free to **file a new issue** with a respective title and description on the the [Frontend Issues](https://github.com/PF-Henrique/test-frontend-eldorado/issues) repository. If you already found a solution to your problem, **i would love to review your pull request**!
 
 
 ## ✨ Me
