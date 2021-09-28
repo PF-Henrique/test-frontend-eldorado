@@ -6,7 +6,7 @@ import { ApiService } from "../api.service";
   selector: "ngbd-modal-confirm",
   template: `
     <div class="modal-header">
-      <h4 class="modal-title" id="modal-title">Device Deletion</h4>
+      <h4 class="modal-title" id="modal-title">Category Deletion</h4>
       <button
         type="button"
         class="close"
@@ -50,7 +50,7 @@ export class NgbdModalConfirm {
   selector: "ngbd-modal-confirm-autofocus",
   template: `
     <div class="modal-header">
-      <h4 class="modal-title" id="modal-title">Edit Device</h4>
+      <h4 class="modal-title" id="modal-title">Edit Category</h4>
       <button
         type="button"
         class="close"
@@ -66,7 +66,7 @@ export class NgbdModalConfirm {
         <div class=" row">
           <div class=" col-md-6 pr-md-1">
             <div class=" form-group">
-              <label> Device Name </label>
+              <label> Category Name </label>
               <input
                 class=" form-control"
                 placeholder="ex: CellPhone"
@@ -76,7 +76,7 @@ export class NgbdModalConfirm {
           </div>
           <div class=" col-md-6 pl-md-1">
             <div class=" form-group">
-              <label> Color </label>
+              <label> Type </label>
               <input
                 class=" form-control"
                 placeholder="Eletronics"
@@ -86,48 +86,15 @@ export class NgbdModalConfirm {
           </div>
         </div>
         <div class=" row">
-          <div class=" col-md-6 pr-md-1">
-            <div class=" form-group">
-              <label> Serial Number </label>
-              <input
-                class=" form-control"
-                placeholder="ex: CellPhone"
-                type="text"
-              />
-            </div>
-          </div>
-          <div class=" col-md-6 pl-md-1">
-            <div class=" form-group">
-              <label> Categories </label>
-              <div class="input-group">
-                <label class="input-group-text" for="inputGroupSelect01"
-                  >Select One Category</label
-                >
-                <select
-                  class="form-select col-md-4"
-                  id="inputGroupSelect01"
-                  style="background-color: #525f7f; border-radius: 3px; height: 35px;"
-                >
-                  <option selected>Choose...</option>
-                  <option value="1">One</option>
-                  <option value="2">Two</option>
-                  <option value="3">Three</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class=" row">
-          <div class=" col-md-10 pr-md-1">
+          <div class=" col-md-8">
             <div class=" form-group">
               <label> Description Category</label>
-              <input
+              <textarea
                 class=" form-control"
                 cols="80"
-                rows="4"
                 placeholder="Here can be your description"
-                type="text"
-              />
+                rows="4"
+              ></textarea>
             </div>
           </div>
         </div>
@@ -153,6 +120,14 @@ export class NgbdModalConfirm {
   `,
 })
 export class NgbdModalConfirmAutofocus {
+  currentproduct = null;
+  message = "";
+  category: any = {
+    id: "",
+    name: "",
+    type: "",
+    description: "",
+  };
   constructor(public modal: NgbActiveModal) {}
 }
 
@@ -162,24 +137,13 @@ const MODALS: { [name: string]: Type<any> } = {
 };
 
 @Component({
-  selector: "app-dashboard",
-  templateUrl: "dashboard.component.html",
-  styleUrls: ["dashboard.component.css"],
+  selector: "app-user",
+  templateUrl: "user.component.html",
+  styleUrls: ["user.component.css"],
 })
-export class DashboardComponent implements OnInit {
+export class UserComponent implements OnInit {
   withAutofocus = `<button type="button" ngbAutofocus class="btn btn-danger"
-  (click)="modal.close('Ok click')">Ok</button>`;
-
-  currentproduct = null;
-  message = "";
-  product: any = {
-    name: "",
-    color: "",
-    category: "",
-    serialNumber: "",
-    description: "",
-  };
-  currentProduct: any;
+(click)="modal.close('Ok click')">Ok</button>`;
 
   constructor(
     private _modalService: NgbModal,
@@ -194,18 +158,18 @@ export class DashboardComponent implements OnInit {
     this.deviceService.readAll().subscribe((devices) => {
       console.log(devices);
     });
-    this.readProducts();
-    this.readProductsById();
-    this.createProduct();
-    this.updateProduct();
-    this.deleteProduct();
+    this.readCategory();
+    this.readCategoriesById();
+    this.createCategory();
+    this.updateCategory();
+    this.deleteCategory();
   }
 
-  readProducts(): void {
+  readCategory(): void {
     this.deviceService.readAll().subscribe(
       (products) => {
-        this.product = products;
-        console.log(this.product);
+        this.category = products;
+        console.log(this.category);
       },
       (error) => {
         console.log(error);
@@ -213,11 +177,11 @@ export class DashboardComponent implements OnInit {
     );
   }
 
-  readProductsById(id): void {
+  readCategoriesById(id): void {
     this.deviceService.read(id).subscribe(
       (productId) => {
-        this.product = productId;
-        console.log(this.product);
+        this.category = productId;
+        console.log(this.category);
       },
       (error) => {
         console.log(error);
@@ -225,10 +189,10 @@ export class DashboardComponent implements OnInit {
     );
   }
 
-  createProduct(): void {
+  createCategory(): void {
     const data = {
-      name: this.product.name,
-      description: this.product.description,
+      name: this.category.name,
+      description: this.category.description,
     };
 
     this.deviceService.create(data).subscribe(
@@ -242,7 +206,7 @@ export class DashboardComponent implements OnInit {
     );
   }
 
-  updateProduct(id, data): void {
+  updateCategory(id, data): void {
     this.deviceService.update(id, data).subscribe(
       (response) => {
         console.log(response);
@@ -254,7 +218,7 @@ export class DashboardComponent implements OnInit {
     );
   }
 
-  deleteProduct(): void {
+  deleteCategory(): void {
     this.deviceService.delete(this.currentProduct.id).subscribe(
       (response) => {
         console.log(response);
