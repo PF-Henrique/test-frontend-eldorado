@@ -1,6 +1,7 @@
 import { Component, OnInit, Type } from "@angular/core";
 import { NgbActiveModal, NgbModal } from "@ng-bootstrap/ng-bootstrap";
-import { ApiService } from "../api.service";
+import { DeviceService } from "./devices.service";
+import { Categories } from "../categories/categorie.component";
 
 @Component({
   selector: "ngbd-modal-confirm",
@@ -71,6 +72,10 @@ export class NgbdModalConfirm {
                 class=" form-control"
                 placeholder="ex: CellPhone"
                 type="text"
+                id="deviceName"
+                required
+                [(ngModel)]="products.name"
+                name="Device Name"
               />
             </div>
           </div>
@@ -81,6 +86,10 @@ export class NgbdModalConfirm {
                 class=" form-control"
                 placeholder="Eletronics"
                 type="text"
+                id="color"
+                required
+                [(ngModel)]="products.color"
+                name="Color"
               />
             </div>
           </div>
@@ -93,6 +102,10 @@ export class NgbdModalConfirm {
                 class=" form-control"
                 placeholder="ex: CellPhone"
                 type="text"
+                id="serialNumber"
+                required
+                [(ngModel)]="product.serialNumber"
+                name="Serial Number"
               />
             </div>
           </div>
@@ -109,9 +122,7 @@ export class NgbdModalConfirm {
                   style="background-color: #525f7f; border-radius: 3px; height: 35px;"
                 >
                   <option selected>Choose...</option>
-                  <option value="1">One</option>
-                  <option value="2">Two</option>
-                  <option value="3">Three</option>
+                  <option value="1">{{}}</option>
                 </select>
               </div>
             </div>
@@ -166,24 +177,26 @@ const MODALS: { [name: string]: Type<any> } = {
   templateUrl: "dashboard.component.html",
   styleUrls: ["dashboard.component.css"],
 })
-export class DashboardComponent implements OnInit {
+export class DevicesComponent implements OnInit {
   withAutofocus = `<button type="button" ngbAutofocus class="btn btn-danger"
   (click)="modal.close('Ok click')">Ok</button>`;
 
   currentproduct = null;
   message = "";
-  product: any = {
+
+  products: any = {
+    id: "",
     name: "",
     color: "",
-    category: "",
+    category: [],
     serialNumber: "",
-    description: "",
   };
   currentProduct: any;
 
   constructor(
     private _modalService: NgbModal,
-    private deviceService: ApiService
+    private deviceService: DeviceService,
+    private categoryService: Categories
   ) {}
 
   open(name: string) {
@@ -191,33 +204,19 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.deviceService.readAll().subscribe((devices) => {
-      console.log(devices);
-    });
     this.readProducts();
-    this.readProductsById();
-    this.createProduct();
-    this.updateProduct();
-    this.deleteProduct();
+    this.getCategories();
+  }
+
+  getCategories() {
+    this.categoryService.readCategory();
   }
 
   readProducts(): void {
     this.deviceService.readAll().subscribe(
       (products) => {
-        this.product = products;
-        console.log(this.product);
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
-  }
-
-  readProductsById(id): void {
-    this.deviceService.read(id).subscribe(
-      (productId) => {
-        this.product = productId;
-        console.log(this.product);
+        this.products = products;
+        console.log(this.products);
       },
       (error) => {
         console.log(error);
@@ -227,9 +226,15 @@ export class DashboardComponent implements OnInit {
 
   createProduct(): void {
     const data = {
-      name: this.product.name,
-      description: this.product.description,
+      name: this.products.name,
+      color: this.products.color,
+      category: this.products.category,
+      serialNumber: this.products.serialNumber,
     };
+    if (!data) {
+      alert("Please add all fields!");
+      return;
+    }
 
     this.deviceService.create(data).subscribe(
       (response) => {

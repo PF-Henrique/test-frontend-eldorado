@@ -1,6 +1,6 @@
 import { Component, OnInit, Type } from "@angular/core";
 import { NgbActiveModal, NgbModal } from "@ng-bootstrap/ng-bootstrap";
-import { ApiService } from "../api.service";
+import { CategoryService } from "./categories.service";
 
 @Component({
   selector: "ngbd-modal-confirm",
@@ -35,7 +35,7 @@ import { ApiService } from "../api.service";
       <button
         type="button"
         class="btn btn-danger"
-        (click)="modal.close('Ok click')"
+        (click)="deleteCategory(category.id)"
       >
         Ok
       </button>
@@ -112,7 +112,7 @@ export class NgbdModalConfirm {
         type="button"
         ngbAutofocus
         class="btn btn-danger"
-        (click)="modal.close('Ok click')"
+        (click)="updateCategory(category.id, category.name)"
       >
         Ok
       </button>
@@ -120,14 +120,6 @@ export class NgbdModalConfirm {
   `,
 })
 export class NgbdModalConfirmAutofocus {
-  currentproduct = null;
-  message = "";
-  category: any = {
-    id: "",
-    name: "",
-    type: "",
-    description: "",
-  };
   constructor(public modal: NgbActiveModal) {}
 }
 
@@ -141,13 +133,21 @@ const MODALS: { [name: string]: Type<any> } = {
   templateUrl: "user.component.html",
   styleUrls: ["user.component.css"],
 })
-export class UserComponent implements OnInit {
+export class Categories implements OnInit {
   withAutofocus = `<button type="button" ngbAutofocus class="btn btn-danger"
 (click)="modal.close('Ok click')">Ok</button>`;
 
+  currentproduct = null;
+  message = "";
+  category: any = {
+    id: "",
+    name: "",
+    description: "",
+  };
+
   constructor(
     private _modalService: NgbModal,
-    private deviceService: ApiService
+    private categoryService: CategoryService
   ) {}
 
   open(name: string) {
@@ -155,38 +155,7 @@ export class UserComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.deviceService.readAll().subscribe((devices) => {
-      console.log(devices);
-    });
     this.readCategory();
-    this.readCategoriesById();
-    this.createCategory();
-    this.updateCategory();
-    this.deleteCategory();
-  }
-
-  readCategory(): void {
-    this.deviceService.readAll().subscribe(
-      (products) => {
-        this.category = products;
-        console.log(this.category);
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
-  }
-
-  readCategoriesById(id): void {
-    this.deviceService.read(id).subscribe(
-      (productId) => {
-        this.category = productId;
-        console.log(this.category);
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
   }
 
   createCategory(): void {
@@ -194,11 +163,28 @@ export class UserComponent implements OnInit {
       name: this.category.name,
       description: this.category.description,
     };
+    if (!data) {
+      alert("Please add all fields!");
+      return;
+    }
 
-    this.deviceService.create(data).subscribe(
+    this.categoryService.create(data).subscribe(
       (response) => {
         console.log(response);
         this.message = "The product was created!";
+        alert(this.message);
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+  }
+
+  readCategory(): void {
+    this.categoryService.readAll().subscribe(
+      (categories) => {
+        this.category = categories;
+        console.log(this.category);
       },
       (error) => {
         console.log(error);
@@ -207,7 +193,7 @@ export class UserComponent implements OnInit {
   }
 
   updateCategory(id, data): void {
-    this.deviceService.update(id, data).subscribe(
+    this.categoryService.update(id, data).subscribe(
       (response) => {
         console.log(response);
         this.message = "The product was updated!";
@@ -218,11 +204,11 @@ export class UserComponent implements OnInit {
     );
   }
 
-  deleteCategory(): void {
-    this.deviceService.delete(this.currentProduct.id).subscribe(
+  deleteCategory(id: number) {
+    this.categoryService.delete(id).subscribe(
       (response) => {
-        console.log(response);
-        this.message = "The product was updated!";
+        this.category = this.category.filter((item) => item.id !== id);
+        this.message = "The product was deleted!";
       },
       (error) => {
         console.log(error);
